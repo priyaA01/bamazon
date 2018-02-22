@@ -44,11 +44,13 @@ function start() {
 }
 
 function productSales() {
-	connection.query("SELECT * FROM departments", function (err, res) {
+
+	connection.query("SELECT d.*,SUM(product_sales) AS product_sales ,SUM(product_sales) - d.over_head_costs  AS total_profit FROM departments d INNER JOIN products p WHERE  d.department_name = p.department_name GROUP BY p.department_name order by d.department_id",
+	 function (err, res) {
 		for (var i = 0; i < res.length; i++) {
-			console.log(res[i].item_id + "    |   " + res[i].product_name + "     |   " + res[i].price);
+			console.log(res[i].department_id + "    |   " + res[i].department_name + "     |   " + res[i].over_head_costs + "    |   " + res[i].product_sales + "     |   " + res[i].total_profit);
 		}
-		console.table(['department_id','department_name','over_head_costs','product_sales','total_profit'],values);
+		//console.table(['department_id','department_name','over_head_costs','product_sales','total_profit'],values);
 		
 		start();
 	});
