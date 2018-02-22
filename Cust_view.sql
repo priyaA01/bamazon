@@ -1,6 +1,8 @@
 CREATE DATABASE bamazon;
 
--- DROP TABLE bamazon.products;
+SELECT * FROM bamazon.products;
+
+-- drop table bamazon.products;
 
 CREATE TABLE bamazon.products (
     item_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -10,6 +12,14 @@ CREATE TABLE bamazon.products (
     stock_quantity INT
 );
 
+ALTER TABLE bamazon.products
+	ADD COLUMN product_sales DECIMAL(10,2);
+
+ALTER TABLE bamazon.products
+	ADD FOREIGN KEY (department_name) REFERENCES bamazon.departments(department_name);
+ 
+ -- delete from bamazon.products;
+ 
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("soap","baby",3.00,30);
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("diaper","baby",15.00,60);
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("swings","baby",82.25,10);
@@ -20,3 +30,9 @@ INSERT INTO bamazon.products (product_name, department_name, price,stock_quantit
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("coffee maker","kitchen",19.99,20);
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("wonder","books",10.19,55);
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("harry potter","books",28.82,45);
+
+
+-- UPDATE bamazon.products SET stock_quantity=0 WHERE item_id=1;
+
+    
+   

@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+const table = require('console.table');
 
 // create the connection information for the sql database
 var connection = mysql.createConnection({
@@ -12,7 +13,7 @@ var connection = mysql.createConnection({
 
 connection.connect(function (err) {
 	if (err) throw err;
-	console.log("connected as id " + connection.threadId);
+	//console.log("connected as id " + connection.threadId);
 	queryAllProducts();
 });
 
@@ -22,19 +23,19 @@ function queryAllProducts() {
 		console.log("-----------------------------------");
 		for (var i = 0; i < res.length; i++) {
 			console.log(res[i].item_id + "    |   " + res[i].product_name + "     |   " + res[i].price);
+			//console.table(res[i].item_id ,res[i].product_name ,res[i].price);
 		}
+
 		console.log("-----------------------------------");
+
 		cust_view();
 	});
 
-	//connection.end();
+
 }
 
 function start() {
-	console.log("Customer View over");
-	//queryAllProducts();
 	connection.end();
-
 }
 
 // function which prompts the user asking for what product they want to buy
@@ -69,12 +70,11 @@ function cust_view() {
 						}
 						//console.log(chosenItem);
 					}
-					console.log(chosenItem.stock_quantity - parseInt(answer.productquantity));
-					console.log(answer.productquantity);
 					if (chosenItem.stock_quantity - parseInt(answer.productquantity) > 0) {
 						connection.query(
 							"UPDATE products SET ? WHERE ?", [{
-									stock_quantity: chosenItem.stock_quantity - parseInt(answer.productquantity)
+									stock_quantity: chosenItem.stock_quantity - parseInt(answer.productquantity),
+									product_sales : chosenItem.product_sales + (chosenItem.price * parseInt(answer.productquantity))
 								},
 								{
 									item_id: chosenItem.item_id
@@ -82,7 +82,7 @@ function cust_view() {
 							],
 							function (error) {
 								if (error) throw err;
-								console.log("Quantity Updated successfully!");
+								console.log("Your Order Placed Successfully!!!");
 								var totalCost = parseInt(answer.productquantity) * chosenItem.price;
 								console.log("Total Cost of your Purchase : " + totalCost);
 								start();
