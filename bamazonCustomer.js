@@ -99,48 +99,56 @@ function cust_view() {
 			.then(function (answer) {
 				if (answer.confirm) {
 					// gets the information of the chosen item
-					var chosenItem;
+					var chosenItem = "";
 					for (var i = 0; i < results.length; i++) {
 						if (results[i].item_id === parseInt(answer.productid)) {
 							chosenItem = results[i];
 						}
 					}
-					//if the chosenItems quantity is more than the user asked quantity
-					if (chosenItem.stock_quantity - parseInt(answer.productquantity) > 0) {
-						// update products table - chosenitem's quantity and its product sales 
-						connection.query(
-							"UPDATE products SET ? WHERE ?", [{
-									stock_quantity: chosenItem.stock_quantity - parseInt(answer.productquantity),
-									product_sales: chosenItem.product_sales + (chosenItem.price * parseInt(answer.productquantity))
-								},
-								{
-									item_id: chosenItem.item_id
-								}
-							],
-							function (error) {
-								if (error) throw err;
-								console.log("\n  YOUR ORDER PLACED SUCCESSFULLY!!!");
-								//it calculates total cost for the user and displays
-								var totalCost = parseInt(answer.productquantity) * chosenItem.price;
-								console.log("***************************************************");
-								console.log("\n  TOTAL COST OF YOUR PURCHASE : " + totalCost + "$");
-								console.log("***************************************************");
+					//if product not exists
+					if (chosenItem === "") {
+						console.log("\n****************************************");
+						console.log("     PRODUCT NOT AVAILABLE! TRY AGAIN");
+						console.log("****************************************\n");
+						//allow to shop again 
+						cust_view();
+					} else {
+						//if the chosenItems quantity is more than the user asked quantity
+						if (chosenItem.stock_quantity - parseInt(answer.productquantity) < 0) {
+							// update products table - chosenitem's quantity and its product sales 
+							connection.query(
+								"UPDATE products SET ? WHERE ?", [{
+										stock_quantity: chosenItem.stock_quantity - parseInt(answer.productquantity),
+										product_sales: chosenItem.product_sales + (chosenItem.price * parseInt(answer.productquantity))
+									},
+									{
+										item_id: chosenItem.item_id
+									}
+								],
+								function (error) {
+									if (error) throw err;
+									console.log("\n  YOUR ORDER PLACED SUCCESSFULLY!!!");
+									//it calculates total cost for the user and displays
+									var totalCost = parseInt(answer.productquantity) * chosenItem.price;
+									console.log("***************************************************");
+									console.log("\n  TOTAL COST OF YOUR PURCHASE : " + totalCost + "$");
+									console.log("***************************************************");
 
-								//start over function
-								start();
-							}
-						);
+									//start over function
+									start();
+								});
+						}
+						//if the chosenItems quantity is less than the user asked quantity 
+						else {
+							console.log("\n***************************************************");
+							console.log("    INSUFFICIENT QUANTITY!!!");
+							console.log("***************************************************");
 
+							//start over function
+							start();
+						}
 					}
-					//if the chosenItems quantity is less than the user asked quantity 
-					else {
-						console.log("\n***************************************************");
-						console.log("    INSUFFICIENT QUANTITY!!!");
-						console.log("***************************************************");
 
-						//start over function
-						start();
-					}
 				} else {
 					//if not sure try again
 					cust_view();

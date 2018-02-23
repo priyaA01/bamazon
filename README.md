@@ -1,2 +1,2 @@
 # bamazon
-Bamazon iis an Amazon-like storefront created with NodeJS and MySQL.
+Bamazon iis an Amazon-like storefront built with NodeJS and MySQL

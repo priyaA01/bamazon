@@ -164,8 +164,8 @@ function addQuantity() {
 
 //function to add new product
 function addProduct() {
-	//query to get available departments - can add product in existing department
-	connection.query("SELECT product_name,department_name FROM departments", function (err, results) {
+	//query to get available departments - can only add products in existing department
+	connection.query("SELECT * FROM departments", function (err, results) {
 		if (err) throw err;
 		//prompt to get new prodcut details
 		inquirer
@@ -225,17 +225,20 @@ function addProduct() {
 					default: true
 				}
 			]).then(function (ans) {
+				//once details of the new product is confirmed
 				if (ans.confirm) {
-					//once details of the new product is confirmed
-					//check if the product already exists in that department
+				//check if the product already exists in products
+				connection.query("SELECT * FROM products", function (err, res) {
+				if (err) throw err;
 					var chosenItem = "";
 					for (var i = 0; i < results.length; i++) {
-						if ((results[i].department_name).toLowerCase() === (ans.deptname).toLowerCase()
-							&& (results[i].product_name).toLowerCase() === (ans.productname).toLowerCase()) {
-							chosenItem = results[i];
+						if (res[i].product_name === (ans.productname).toLowerCase()
+						 && res[i].department_name === ans.department)
+						{
+							chosenItem = res[i];
 						}
 					}
-					//if department already exists
+					//if product already exists
 					if (chosenItem !="") {
 						console.log("\n*******************************************************");
 						console.log("     PRODUCT ALREADY EXISTS IN THAT DEPARTMENT! TRY AGAIN");
@@ -261,6 +264,7 @@ function addProduct() {
 							start();
 						});
 					}
+				});
 					
 				} else {
 					//if not sure allow to add again 
