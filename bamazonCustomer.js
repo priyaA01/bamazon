@@ -114,7 +114,7 @@ function cust_view() {
 						cust_view();
 					} else {
 						//if the chosenItems quantity is more than the user asked quantity
-						if (chosenItem.stock_quantity - parseInt(answer.productquantity) < 0) {
+						if (chosenItem.stock_quantity - parseInt(answer.productquantity) >= 0) {
 							// update products table - chosenitem's quantity and its product sales 
 							connection.query(
 								"UPDATE products SET ? WHERE ?", [{

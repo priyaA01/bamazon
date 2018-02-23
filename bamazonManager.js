@@ -231,7 +231,7 @@ function addProduct() {
 				connection.query("SELECT * FROM products", function (err, res) {
 				if (err) throw err;
 					var chosenItem = "";
-					for (var i = 0; i < results.length; i++) {
+					for (var i = 0; i < res.length; i++) {
 						if (res[i].product_name === (ans.productname).toLowerCase()
 						 && res[i].department_name === ans.department)
 						{

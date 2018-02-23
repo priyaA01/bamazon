@@ -3,7 +3,6 @@ CREATE DATABASE bamazon;
 SELECT * FROM bamazon.products;
 
 SELECT item_id FROM bamazon.products ORDER BY item_id;
--- drop table bamazon.products;
 
 CREATE TABLE bamazon.products (
     item_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
@@ -19,7 +18,6 @@ ALTER TABLE bamazon.products
 ALTER TABLE bamazon.products
 	ADD FOREIGN KEY (department_name) REFERENCES bamazon.departments(department_name);
  
- -- delete from bamazon.products;
  
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("soap","baby",3.00,30);
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("diaper","baby",15.00,60);
@@ -33,7 +31,7 @@ INSERT INTO bamazon.products (product_name, department_name, price,stock_quantit
 INSERT INTO bamazon.products (product_name, department_name, price,stock_quantity) VALUES("harry potter","books",28.82,45);
 
 
--- UPDATE bamazon.products SET stock_quantity=0 WHERE item_id=1;
+
 
     
    
