@@ -1,7 +1,9 @@
+//npm packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+const table = require('console.table');
 
-// create the connection information for the sql database
+//connection information for the sql database
 var connection = mysql.createConnection({
 	host: "localhost",
 	port: 3306,
@@ -37,7 +39,7 @@ function start() {
 					productSales();
 				} else if (response.menuchoice === "Create New Department") {
 					addDepartment();
-				} 
+				}
 			}
 
 		});
@@ -46,19 +48,15 @@ function start() {
 function productSales() {
 
 	connection.query("SELECT d.*,SUM(product_sales) AS product_sales ,SUM(product_sales) - d.over_head_costs  AS total_profit FROM departments d INNER JOIN products p WHERE  d.department_name = p.department_name GROUP BY p.department_name order by d.department_id",
-	 function (err, res) {
-		for (var i = 0; i < res.length; i++) {
-			console.log(res[i].department_id + "    |   " + res[i].department_name + "     |   " + res[i].over_head_costs + "    |   " + res[i].product_sales + "     |   " + res[i].total_profit);
-		}
-		//console.table(['department_id','department_name','over_head_costs','product_sales','total_profit'],values);
-		
-		start();
-	});
+		function (err, res) {
+			console.table(res);
+
+			start();
+		});
 
 }
 
-function addDepartment()
-{
+function addDepartment() {
 	console.log("Adding new department...\n");
 
 	inquirer

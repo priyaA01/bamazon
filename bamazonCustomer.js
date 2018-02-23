@@ -1,8 +1,9 @@
+//npm packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const table = require('console.table');
 
-// create the connection information for the sql database
+//connection information for the sql database
 var connection = mysql.createConnection({
 	host: "localhost",
 	port: 3306,
@@ -11,47 +12,75 @@ var connection = mysql.createConnection({
 	database: "bamazon"
 });
 
+// connect to the mysql server and sql database
 connection.connect(function (err) {
 	if (err) throw err;
-	//console.log("connected as id " + connection.threadId);
+	// function call after the connection is made to display all products
 	queryAllProducts();
 });
 
+//function to display all of the items available for sale
 function queryAllProducts() {
-	connection.query("SELECT * FROM products", function (err, res) {
-		console.log("Id   |   Product    |     Price");
-		console.log("-----------------------------------");
-		for (var i = 0; i < res.length; i++) {
-			console.log(res[i].item_id + "    |   " + res[i].product_name + "     |   " + res[i].price);
-			//console.table(res[i].item_id ,res[i].product_name ,res[i].price);
-		}
-
-		console.log("-----------------------------------");
-
+	// query the database for all items from products
+	connection.query("SELECT item_id,product_name,price FROM products", function (err, results) {
+		if (err) throw err;
+		console.log("\n");
+		//data displayed in table format in the console
+		console.table(results);
+		//function call to let user place order
 		cust_view();
 	});
 
 
 }
 
+//function to prompt user for more order else end connection
 function start() {
-	connection.end();
+	//user prompt to continue or end
+	console.log("\n");
+	inquirer
+		.prompt([{
+			type: "confirm",
+			message: "Are you done Shopping?",
+			name: "confirm",
+			default: true
+		}]).then(function (res) {
+			//end connection or start over
+			if (res.confirm) {
+				connection.end();
+			} else {
+				queryAllProducts();
+			}
+
+		});
 }
 
 // function which prompts the user asking for what product they want to buy
 function cust_view() {
 	connection.query("SELECT * FROM products", function (err, results) {
-		if (err) throw err;
+		//prompt to let user place order- asks for product id and quantity
 		inquirer
 			.prompt([{
 					type: "input",
-					message: "Enter the ID of the product you would like to buy:  ",
-					name: "productid"
+					message: "Enter the Product ID you would like to buy:  ",
+					name: "productid",
+					validate: function (value) {
+						if (isNaN(value) === false) {
+							return true;
+						}
+						return false;
+					}
 				},
 				{
 					type: "input",
 					message: "Enter the Quantity you would like to buy:  ",
-					name: "productquantity"
+					name: "productquantity",
+					validate: function (value) {
+						if (isNaN(value) === false) {
+							return true;
+						}
+						return false;
+					}
 				},
 				{
 					type: "confirm",
@@ -61,20 +90,21 @@ function cust_view() {
 				}
 			])
 			.then(function (answer) {
-				//console.log("results " +results[0]);
-				if (answer.confirm === true) {
+				if (answer.confirm && answer.productid != "" && answer.productquantity != "") {
+					// gets the information of the chosen item
 					var chosenItem;
 					for (var i = 0; i < results.length; i++) {
 						if (results[i].item_id === parseInt(answer.productid)) {
 							chosenItem = results[i];
 						}
-						//console.log(chosenItem);
 					}
+					//if the chosenItems quantity is more than the user asked quantity
 					if (chosenItem.stock_quantity - parseInt(answer.productquantity) > 0) {
+						// update products table - chosenitem's quantity and its product sales 
 						connection.query(
 							"UPDATE products SET ? WHERE ?", [{
 									stock_quantity: chosenItem.stock_quantity - parseInt(answer.productquantity),
-									product_sales : chosenItem.product_sales + (chosenItem.price * parseInt(answer.productquantity))
+									product_sales: chosenItem.product_sales + (chosenItem.price * parseInt(answer.productquantity))
 								},
 								{
 									item_id: chosenItem.item_id
@@ -82,19 +112,30 @@ function cust_view() {
 							],
 							function (error) {
 								if (error) throw err;
-								console.log("Your Order Placed Successfully!!!");
+								console.log("\nYour Order Placed Successfully!!!");
+								//it calculates total cost for the user and displays
 								var totalCost = parseInt(answer.productquantity) * chosenItem.price;
-								console.log("Total Cost of your Purchase : " + totalCost);
+								console.log("\nTotal Cost of your Purchase : " + totalCost + "$");
+								//start over function
 								start();
 							}
 						);
-					} else {
-						// quantity wasn't high enough
-						console.log("Insufficient quantity!");
+
+					}
+					//if the chosenItems quantity is less than the user asked quantity 
+					else {
+						console.log("\nInsufficient quantity!");
+						//start over function
 						start();
 					}
+				} else if (answer.confirm) {
+					//prompting for product to buy again
+					console.log("\n PLEASE ENTER PRODUCT ID AND QUANTITY\n");
+					cust_view();
+				} else {
+					//start over
+					start();
 				}
 			});
-
 	});
 }

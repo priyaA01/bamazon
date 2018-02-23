@@ -1,7 +1,9 @@
+//npm packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+const table = require('console.table');
 
-// create the connection information for the sql database
+//connection information for the sql database
 var connection = mysql.createConnection({
 	host: "localhost",
 	port: 3306,
@@ -51,13 +53,8 @@ function start() {
 function availableProducts() {
 	connection.query("SELECT * FROM products where stock_quantity > 0", function (err, res) {
 		if (err) throw err;
-		console.log("Id   |   Product    |     Price    | Quantity");
-		console.log("-----------------------------------");
-		for (var i = 0; i < res.length; i++) {
-			console.log(res[i].item_id + "   " + res[i].product_name + "   " + res[i].price + "   " + res[i].stock_quantity);
-		}
-		console.log("-----------------------------------");
-
+		console.log("\n");
+		console.table(res);
 		start();
 	});
 
@@ -66,13 +63,8 @@ function availableProducts() {
 function lowInventory() {
 	connection.query("SELECT * FROM products where stock_quantity <= 5", function (err, res) {
 		if (err) throw err;
-		console.log("Id   |   Product    |     Price    | Quantity");
-		console.log("-----------------------------------");
-		for (var i = 0; i < res.length; i++) {
-			console.log(res[i].item_id + "   " + res[i].product_name + "   " + res[i].price + "   " + res[i].stock_quantity);
-		}
-		console.log("-----------------------------------");
-
+		console.log("\n");
+		console.table(res);
 		start();
 	});
 
@@ -106,7 +98,6 @@ function addQuantity() {
 						if (results[i].item_id === parseInt(answer.productid)) {
 							chosenItem = results[i];
 						}
-						//console.log(chosenItem);
 					}
 					console.log("prod id " + chosenItem.item_id);
 					connection.query(
