@@ -12,13 +12,16 @@ var connection = mysql.createConnection({
 	database: "bamazon"
 });
 
+// connect to the mysql server and sql database
 connection.connect(function (err) {
 	if (err) throw err;
-	console.log("connected as id " + connection.threadId);
+	//function to display prompts for manager to choose from
 	start();
 });
 
+//prompt with menu options for manager to choose from
 function start() {
+
 	inquirer
 		.prompt([{
 				type: "list",
@@ -28,12 +31,13 @@ function start() {
 			},
 			{
 				type: "confirm",
-				message: "Are you sure:",
+				message: "Do You want to continue:",
 				name: "confirm",
 				default: true
 			}
 		])
 		.then(function (response) {
+			//if the choice is confirmed, relavant function call is made
 			if (response.confirm) {
 				if (response.menuchoice === "View Products for Sale") {
 					availableProducts();
@@ -45,45 +49,70 @@ function start() {
 					addProduct();
 				}
 			}
+			else{
+				connection.end();
+			}
 
 		});
 }
 
-
+//function to view all products
 function availableProducts() {
-	connection.query("SELECT * FROM products where stock_quantity > 0", function (err, res) {
+	// query the database for all items from products
+	connection.query("SELECT item_id,product_name,price,stock_quantity FROM products", function (err, res) {
 		if (err) throw err;
 		console.log("\n");
+		//data displayed in table format in the console
 		console.table(res);
+		//function call to display menu options
 		start();
 	});
 
 }
 
+//function to view low inventory
 function lowInventory() {
-	connection.query("SELECT * FROM products where stock_quantity <= 5", function (err, res) {
+	//query the database for all items with low inventory from products
+	connection.query("SELECT item_id,product_name,price,stock_quantity FROM products where stock_quantity < 5", function (err, res) {
 		if (err) throw err;
 		console.log("\n");
+		//data displayed in table format in the console
 		console.table(res);
+		//function call to display menu options 
 		start();
 	});
 
 }
 
-
+//function to add product quantity
 function addQuantity() {
+	//query the database for all items 
 	connection.query("SELECT * FROM products", function (err, results) {
 		if (err) throw err;
 		inquirer
-			.prompt([{
-					type: "input",
-					message: "Enter the ID of the product you would like to add stock:  ",
+			.prompt([
+				{
+					type: "rawlist",
+					choices: function() {
+		            var choiceArray = [];
+		            for (var i = 0; i < results.length; i++) {
+		              choiceArray.push(results[i].item_id);
+		            }
+		            return choiceArray;
+		            },
+					message: "Choose the Product ID you would like to add stock:  ",
 					name: "productid"
 				},
 				{
 					type: "input",
 					message: "Enter the Quantity you would like to add:  ",
-					name: "productquantity"
+					name: "productquantity",
+					validate: function (value) {
+						if (isNaN(value) === false ) {
+							return value !=="";
+						}
+						return "Please Provide Valid Quantity";
+					}
 				},
 				{
 					type: "confirm",
@@ -92,14 +121,13 @@ function addQuantity() {
 					default: true
 				}
 			]).then(function (answer) {
-				if (answer.confirm === true) {
+				if (answer.confirm) {
 					var chosenItem;
 					for (var i = 0; i < results.length; i++) {
 						if (results[i].item_id === parseInt(answer.productid)) {
 							chosenItem = results[i];
 						}
 					}
-					console.log("prod id " + chosenItem.item_id);
 					connection.query(
 						"UPDATE products SET ? WHERE ?", [{
 								stock_quantity: chosenItem.stock_quantity + parseInt(answer.productquantity)
@@ -110,9 +138,13 @@ function addQuantity() {
 						],
 						function (error) {
 							if (error) throw err;
-							console.log("Quantity Added successfully!");
+							console.log("\n Product Quantity Added successfully!");
 							start();
 						});
+				}
+				else
+				{
+					addQuantity();
 				}
 
 			});
@@ -126,17 +158,35 @@ function addProduct() {
 		.prompt([{
 				type: "input",
 				message: "Enter the Product Name of the new product:  ",
-				name: "productname"
+				name: "productname",
+				validate: function (value) {
+					if (isNaN(value)) {
+						return value !=="";
+					}
+					return "Please Provide Product Name";
+				}
 			},
 			{
 				type: "input",
 				message: "Enter the Quantity for the new product:  ",
-				name: "productquantity"
+				name: "productquantity",
+				validate: function (value) {
+					if (isNaN(value) === false ) {
+						return value !=="";
+					}
+					return "Please Provide Quantity in Numbers";
+				}
 			},
 			{
 				type: "input",
-				message: "Enter the base Price for the new product:  ",
-				name: "productprice"
+				message: "Enter the Base Price for the new product:  ",
+				name: "productprice",
+				validate: function (value) {
+					if (isNaN(value) === false ) {
+						return value !=="";
+					}
+					return "Please Provide Price in Numbers";
+				}
 			},
 			{
 				type: "confirm",
@@ -145,16 +195,19 @@ function addProduct() {
 				default: true
 			}
 		]).then(function (ans) {
-			if (ans.confirm === true) {
+			if (ans.confirm) {
 				connection.query("INSERT INTO products SET ?", {
 						product_name: ans.productname,
 						price: ans.productquantity,
 						stock_quantity: ans.productprice
 					},
 					function (err, res) {
-						console.log(res.affectedRows + " Product inserted!\n");
+						console.log("\nProduct Added Successfully!\n");
 						start();
 					});
+			}
+			else{
+				addProduct();
 			}
 		});
 

@@ -66,9 +66,9 @@ function cust_view() {
 					name: "productid",
 					validate: function (value) {
 						if (isNaN(value) === false) {
-							return true;
+							return value !== "" ;
 						}
-						return false;
+						return "Please Provide Product ID in Numbers";
 					}
 				},
 				{
@@ -76,10 +76,10 @@ function cust_view() {
 					message: "Enter the Quantity you would like to buy:  ",
 					name: "productquantity",
 					validate: function (value) {
-						if (isNaN(value) === false) {
-							return true;
+						if (isNaN(value) === false ) {
+							return value !=="";
 						}
-						return false;
+						return "Please Provide Quantity in Numbers";
 					}
 				},
 				{
@@ -90,7 +90,7 @@ function cust_view() {
 				}
 			])
 			.then(function (answer) {
-				if (answer.confirm && answer.productid != "" && answer.productquantity != "") {
+				if (answer.confirm) {
 					// gets the information of the chosen item
 					var chosenItem;
 					for (var i = 0; i < results.length; i++) {
@@ -128,11 +128,7 @@ function cust_view() {
 						//start over function
 						start();
 					}
-				} else if (answer.confirm) {
-					//prompting for product to buy again
-					console.log("\n PLEASE ENTER PRODUCT ID AND QUANTITY\n");
-					cust_view();
-				} else {
+				}  else {
 					//start over
 					start();
 				}

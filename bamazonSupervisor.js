@@ -41,6 +41,9 @@ function start() {
 					addDepartment();
 				}
 			}
+			else{
+				connection.end();
+			}
 
 		});
 }
@@ -77,7 +80,7 @@ function addDepartment() {
 				default: true
 			}
 		]).then(function (ans) {
-			if (ans.confirm === true) {
+			if (ans.confirm) {
 				connection.query("INSERT INTO departments SET ?", {
 						department_name: ans.deptname,
 						over_head_costs: ans.deptcosts,
@@ -86,6 +89,9 @@ function addDepartment() {
 						console.log(res.affectedRows + " Product inserted!\n");
 						start();
 					});
+			}
+			else{
+				addDepartment();
 			}
 		});
 
