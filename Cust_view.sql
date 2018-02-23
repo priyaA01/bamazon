@@ -2,6 +2,7 @@ CREATE DATABASE bamazon;
 
 SELECT * FROM bamazon.products;
 
+SELECT item_id FROM bamazon.products ORDER BY item_id;
 -- drop table bamazon.products;
 
 CREATE TABLE bamazon.products (

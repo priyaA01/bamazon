@@ -15,6 +15,9 @@ var connection = mysql.createConnection({
 // connect to the mysql server and sql database
 connection.connect(function (err) {
 	if (err) throw err;
+	console.log("\n   ***************************************");
+	console.log("\n    WELCOME TO BAMAZON!! ENJOY SHOPPING");
+	console.log("\n   ***************************************");
 	// function call after the connection is made to display all products
 	queryAllProducts();
 });
@@ -24,9 +27,9 @@ function queryAllProducts() {
 	// query the database for all items from products
 	connection.query("SELECT item_id,product_name,price FROM products", function (err, results) {
 		if (err) throw err;
-		console.log("\n");
+		console.log("\n  ");
 		//data displayed in table format in the console
-		console.table(results);
+		console.table(" AVAILABLE PRODUCT LIST", results);
 		//function call to let user place order
 		cust_view();
 	});
@@ -41,12 +44,14 @@ function start() {
 	inquirer
 		.prompt([{
 			type: "confirm",
-			message: "Are you done Shopping?",
+			message: "ARE YOU DONE SHOPPING?",
 			name: "confirm",
 			default: true
 		}]).then(function (res) {
 			//end connection or start over
 			if (res.confirm) {
+				console.log("\n-------------------------------------------------------------");
+				console.log("   THANK YOU FOR SHOPPING AT BAMAZON!! Credits : PRIYA\n");
 				connection.end();
 			} else {
 				queryAllProducts();
@@ -57,34 +62,36 @@ function start() {
 
 // function which prompts the user asking for what product they want to buy
 function cust_view() {
+	//query to get available products
 	connection.query("SELECT * FROM products", function (err, results) {
+		if (err) throw err;
 		//prompt to let user place order- asks for product id and quantity
 		inquirer
 			.prompt([{
 					type: "input",
-					message: "Enter the Product ID you would like to buy:  ",
+					message: "\nEnter the Product ID you would like to buy:  ",
 					name: "productid",
 					validate: function (value) {
-						if (isNaN(value) === false) {
-							return value !== "" ;
+						if (isNaN(value) === false && value > 0) {
+							return value !== "";
 						}
-						return "Please Provide Product ID in Numbers";
+						return "PLEASE PROVIDE PRODUCT ID IN NUMBERS";
 					}
 				},
 				{
 					type: "input",
-					message: "Enter the Quantity you would like to buy:  ",
+					message: "\nEnter the Quantity you would like to buy:  ",
 					name: "productquantity",
 					validate: function (value) {
-						if (isNaN(value) === false ) {
-							return value !=="";
+						if (isNaN(value) === false && value > 0) {
+							return value !== "";
 						}
-						return "Please Provide Quantity in Numbers";
+						return "PLEASE PROVIDE QUANTITY IN NUMBERS";
 					}
 				},
 				{
 					type: "confirm",
-					message: "Are you sure:",
+					message: "\nARE YOU SURE? ",
 					name: "confirm",
 					default: true
 				}
@@ -112,10 +119,13 @@ function cust_view() {
 							],
 							function (error) {
 								if (error) throw err;
-								console.log("\nYour Order Placed Successfully!!!");
+								console.log("\n  YOUR ORDER PLACED SUCCESSFULLY!!!");
 								//it calculates total cost for the user and displays
 								var totalCost = parseInt(answer.productquantity) * chosenItem.price;
-								console.log("\nTotal Cost of your Purchase : " + totalCost + "$");
+								console.log("***************************************************");
+								console.log("\n  TOTAL COST OF YOUR PURCHASE : " + totalCost + "$");
+								console.log("***************************************************");
+
 								//start over function
 								start();
 							}
@@ -124,13 +134,16 @@ function cust_view() {
 					}
 					//if the chosenItems quantity is less than the user asked quantity 
 					else {
-						console.log("\nInsufficient quantity!");
+						console.log("\n***************************************************");
+						console.log("    INSUFFICIENT QUANTITY!!!");
+						console.log("***************************************************");
+
 						//start over function
 						start();
 					}
-				}  else {
-					//start over
-					start();
+				} else {
+					//if not sure try again
+					cust_view();
 				}
 			});
 	});
