@@ -28,7 +28,7 @@ function start() {
 		.prompt([{
 				type: "list",
 				message: "\nWhich would you like to do?",
-				choices: ["View Product Sales by Department", "Create New Department"],
+				choices: ["View Product Sales by Department", "Create New Department", "Exit"],
 				name: "menuchoice"
 			},
 			{
@@ -46,11 +46,14 @@ function start() {
 				} else if (response.menuchoice === "Create New Department") {
 					addDepartment();
 				}
+				else if (response.menuchoice === "Exit"){
+					console.log("\n-------------------------------------------------------------");
+					console.log("   THANK YOU FOR YOUR SERVICE AT BAMAZON!! Credits : PRIYA\n");
+					//to end supervisor view 
+					connection.end();
+				}
 			} else {
-				console.log("\n-------------------------------------------------------------");
-				console.log("   THANK YOU FOR YOUR SERVICE AT BAMAZON!! Credits : PRIYA\n");
-				//to end supervisor view 
-				connection.end();
+				start();
 			}
 
 		});

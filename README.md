@@ -3,9 +3,9 @@ Bamazon iis an Amazon-like storefront built with NodeJS and MySQL
 
 ## Video Walkthrough
 
-* [Customer](https://youtu.be/IMXhCMsG8vc)
-* [Manager](https://youtu.be/TIca2tZJO38)
-* [Supervisor](https://youtu.be/LfxULBpQdAs)
+* ![Customer](bamazon/images/bamazonCustomer.gif)
+* ![Manager](bamazon/images/bamazonManager.gif)
+* ![Supervisor](bamazon/images/bamazonSupervisor.gif)
 
 
 ### Author

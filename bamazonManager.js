@@ -28,7 +28,7 @@ function start() {
 		.prompt([{
 				type: "list",
 				message: "\nWhich would you like to do?",
-				choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"],
+				choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "Exit"],
 				name: "menuchoice"
 			},
 			{
@@ -50,11 +50,15 @@ function start() {
 				} else if (response.menuchoice === "Add New Product") {
 					addProduct();
 				}
+				else if (response.menuchoice === "Exit")
+				{
+					console.log("\n-------------------------------------------------------------");
+					console.log("   THANK YOU FOR YOUR SERVICE AT BAMAZON!! Credits : PRIYA\n");
+					//to end manager view 
+					connection.end();
+				}
 			} else {
-				console.log("\n-------------------------------------------------------------");
-				console.log("   THANK YOU FOR YOUR SERVICE AT BAMAZON!! Credits : PRIYA\n");
-				//to end manager view 
-				connection.end();
+				start();
 			}
 
 		});
